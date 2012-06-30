@@ -1,7 +1,7 @@
 '''
 Created on Jun 29, 2012
 
-@author: ALX
+@author: Cam Moore
 '''
 from cam.Die import Die
 
