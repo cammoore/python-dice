@@ -9,14 +9,6 @@ class Betting(object):
     '''
     Represents the different bets on a Craps table for a single player.
     '''
-    pass_line_bet = 0
-    pass_line_odds = 0
-    place_bets = [0] * 11
-    come_bet = 0
-    come_bets = [0] * 11
-    come_bets_odds = [0] * 11
-    game = None
-    o = None
     
     def play_pass_line(self, bet):
         """Places a bet on the pass line. Returns True if the bet is placed, False otherwise."""
@@ -82,6 +74,23 @@ class Betting(object):
             self.come_bets_odds[number] = 0
             return o
         return 0
+    
+    def come_bets_wo_odds(self):
+        """Returns the point for any come bets without odds."""
+        ret = []
+        for i in [4, 5, 6, 8, 9, 10]:
+            if self.come_bets[i] > 0 and self.come_bets_odds[i] == 0:
+                ret.append(i)
+        return ret
+        
+    def num_come_bets(self):
+        """Returns the number of come bets."""
+        ret = 0
+        for i in [4, 5, 6, 8, 9, 10]:
+            if self.come_bets[i] > 0:
+                ret += 1
+        return ret
+    
         
     def clear_pass_line(self):
         """Clears all pass line bets."""
@@ -102,7 +111,7 @@ class Betting(object):
         ret = "Pass line (%s): %s, odds %s\n" % (self.game.current_point, self.pass_line_bet, self.pass_line_odds)
         for i in [4, 5, 6, 8, 9, 10]:
             ret += ' [p%s' % i + ':  %s]' % self.place_bets[i]
-        ret += '\n'
+        ret += '\nCome:%s' % self.come_bet
         for i in [4, 5, 6, 8, 9, 10]:
             ret += ' [c%s' % i + ':  %s odds %s]' % (self.come_bets[i], self.come_bets_odds[i])        
         return ret    
@@ -138,7 +147,7 @@ class Betting(object):
                 if verbose:
                     print "Off, Yo, pay the line %s" % w
                 return w
-        if g.is_button_off() and not g.pass_line_winner:
+        if g.is_button_off() and not g.pass_line_winner and g.last_roll == 7:
             # just rolled a seven out
             if verbose:
                 print "Seven out. Clear line, come and place bets. Pay the come bet"
@@ -152,6 +161,14 @@ class Betting(object):
             w = 2 * self.come_bet
             self.come_bet = 0
             return w
+        if g.is_button_off() and not g.pass_line_winner and (g.last_roll == 2 or g.last_roll == 3 or g.last_roll == 12):
+            # just rolled a seven out
+            if verbose:
+                print "%s Craps %s. Clear line." % (g.last_roll, g.last_roll)
+            # clear pass line
+            self.clear_pass_line()
+            self.come_bet = 0
+            return 0
         if g.is_button_off() and g.pass_line_winner:
             # just rolled the previous point
             if verbose:
@@ -168,8 +185,10 @@ class Betting(object):
                 if w > 0:
                     pay_come = w
                 self.come_bets[g.last_roll] = 0
+                self.come_bets_odds[g.last_roll] = 0
                 # move come bet to number
                 self.come_bets[g.last_roll] = self.come_bet
+                self.come_bet = 0
                 # pay existing place bets
                 if not g.comming_out:
                     pay_place = self.o.place_bet_odds(g.last_roll, self.place_bets[g.last_roll])
@@ -179,6 +198,7 @@ class Betting(object):
                 # add pass line win
                 pay_pass = 2 * self.pass_line_bet + self.o.pass_odds(g.last_roll, self.pass_line_odds) + self.pass_line_odds
                 w += pay_pass
+                self.clear_pass_line()
             if verbose:
                 print "Roll %s paying pass %s, come %s, place %s" % (g.last_roll, pay_pass, pay_come, pay_place)
             return w
@@ -223,8 +243,10 @@ class Betting(object):
             if w > 0:
                 pay_come = w
             self.come_bets[g.last_roll] = 0
+            self.come_bets_odds[g.last_roll] = 0
             # move come bet to number
             self.come_bets[g.last_roll] = self.come_bet
+            self.come_bet = 0
             # pay existing place bets
             if not g.comming_out:
                 pay_place = self.o.place_bet_odds(g.last_roll, self.place_bets[g.last_roll])
@@ -234,6 +256,7 @@ class Betting(object):
                 # add pass line win
                 pay_pass = 2 * self.pass_line_bet + self.o.pass_odds(g.last_roll, self.pass_line_odds)
                 w += pay_pass
+                self.clear_pass_line()
             if verbose:
                 print "Roll %s paying pass %s, come %s, place %s" % (g.last_roll, pay_pass, pay_come, pay_place)
             return w
@@ -244,4 +267,10 @@ class Betting(object):
         '''
         self.game = game
         self.o = Odds()
+        self.pass_line_bet = 0
+        self.pass_line_odds = 0
+        self.place_bets = [0] * 11
+        self.come_bet = 0
+        self.come_bets = [0] * 11
+        self.come_bets_odds = [0] * 11
         

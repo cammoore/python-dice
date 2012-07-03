@@ -56,11 +56,13 @@ class TestBetting(unittest.TestCase):
         self.betting.game.roll_dice(verbose=True, d1_val=2, d2_val=5)
         self.assertEqual(10, self.betting.check_winnings(), "msg")
         self.assertFalse(self.betting.play_come_bet(5), "msg")
+        self.assertEqual(0, self.betting.num_come_bets(), "expecting 0 got %s" % self.betting.num_come_bets())
         self.betting.game.roll_dice(verbose=True, d1_val=1, d2_val=5)
         self.assertEqual(0, self.betting.check_winnings(), "msg")
         self.assertTrue(self.betting.play_come_bet(5), "msg")
         self.betting.game.roll_dice(verbose=True, d1_val=1, d2_val=3)
-        self.assertEqual(0, self.betting.check_winnings(), "msg")        
+        self.assertEqual(0, self.betting.check_winnings(), "msg")  
+        self.assertEqual(1, self.betting.num_come_bets(), "expected 1 got %s" % self.betting.num_come_bets())      
         self.assertTrue(self.betting.play_come_bet_odds(4, 10), "msg")
         self.betting.game.roll_dice(verbose=True, d1_val=2, d2_val=2)
         self.assertEqual(40, self.betting.check_winnings(verbose=True), "expected 40 got %s" % self.betting.check_winnings())        
@@ -79,6 +81,8 @@ class TestBetting(unittest.TestCase):
         self.betting.check_winnings(verbose=True)
         self.betting.game.roll_dice(verbose=True, d1_val=2, d2_val=4)
         self.assertEqual(32, self.betting.check_winnings(verbose=True), "got %s" % self.betting.check_winnings())
+        
+
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
