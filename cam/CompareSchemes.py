@@ -160,6 +160,6 @@ if __name__ == '__main__':
        
 #    print "Stake (min, mean, max) = (%s, %s, %s)" % (min(stakes), stats.mean(stakes), max(stakes))
 #    print "ATM (min, mean, max) = (%s, %s, %s)" % (min(atms), stats.mean(atms), max(atms))
-    print "Profits1 (min, mean, max) = (%s, %s, %s)" % (min(profits1), stats.mean(profits1), max(profits1))
-    print "Profits2 (min, mean, max) = (%s, %s, %s)" % (min(profits2), stats.mean(profits2), max(profits2))
-    print "Profits3 (min, mean, max) = (%s, %s, %s)" % (min(profits3), stats.mean(profits3), max(profits3))
+    print "Profits across (min, mean, max) = (%s, %.2f, %.2f, %s)" % (min(profits1), stats.median(profits1), stats.mean(profits1), max(profits1))
+    print "Profits 6 and 8 (min, mean, max) = (%s, %.2f, %s)" % (min(profits2), stats.mean(profits2), max(profits2))
+    print "Profits3 2 come bet (min, mean, max) = (%s, %.2f, %s)" % (min(profits3), stats.mean(profits3), max(profits3))
